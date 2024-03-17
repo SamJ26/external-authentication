@@ -87,7 +87,7 @@ public static class Program
             },
             authenticationSchemes: ["Github"]));
 
-        // QUESTION: this endpoint is never invoked and I do not why!
+        // ERROR: I am not able to hit this endpoint
         app.MapGet("/oauth/github-callback", (HttpContext httpContext) => { Console.WriteLine("HELLO"); });
 
         app.Run();
