@@ -19,7 +19,7 @@ public static class Program
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 // We also need to configure second authentication schema which is set as a default schema.
                 .AddCookie()
-                .AddOAuth("github", options =>
+                .AddOAuth("Github", options =>
                 {
                     options.ClientId = configuration["Authentication:Github:ClientId"]!;
                     options.ClientSecret = configuration["Authentication:Github:ClientSecret"]!;
@@ -85,7 +85,7 @@ public static class Program
                 // Note that, this value overrides OAuthOptions.CallbackPath value.
                 RedirectUri = "https://localhost:5056/"
             },
-            authenticationSchemes: ["github"]));
+            authenticationSchemes: ["Github"]));
 
         // QUESTION: this endpoint is never invoked and I do not why!
         app.MapGet("/oauth/github-callback", (HttpContext httpContext) => { Console.WriteLine("HELLO"); });
