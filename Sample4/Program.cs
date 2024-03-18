@@ -7,16 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExternalLogin;
 
-/*
- *OAuthHandler
-   .ExchangeCodeAsync
-    - ClientId
-    - ClientSecret
-   .BuildChallengeUrl
-    - ClientId
- *
- */
-
 public class Program
 {
     public static void Main(string[] args)
