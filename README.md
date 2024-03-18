@@ -5,7 +5,7 @@ Samples:
 - `Sample1` - Github external auth without any extra nuget package
 - `Sample2` - Google external auth using `Microsoft.AspNetCore.Authentication.Google` nuget package
 - `Sample3` - ASP.NET Core Identity + Google external auth using `Microsoft.AspNetCore.Authentication.Google` nuget package
-- `Sample4` - ASP.NET Core Identity + Google external auth using `Microsoft.AspNetCore.Authentication.Google` nuget package + multi-tenancy support
+- `Sample4` - ASP.NET Core Identity + Google external auth using `Microsoft.AspNetCore.Authentication.Google` nuget package + support for dynamic OAuth configuration
 
 Resources:
 
