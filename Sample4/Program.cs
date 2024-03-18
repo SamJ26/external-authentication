@@ -61,15 +61,25 @@ public class Program
 
     private static IResult ChallengeExternalAuthentication([FromServices] SignInManager<IdentityUser> signInManager)
     {
-        var authenticationProperties = signInManager.ConfigureExternalAuthenticationProperties("Google", "/callback");
+        const string tenant = "TENANT";
+
+        // We need to specify tenant in callback URI
+        var authenticationProperties = signInManager.ConfigureExternalAuthenticationProperties("Google", $"/callback?tenant={tenant}");
+
+        // We need to add tenant information into authentication properties to be able to load proper OAuth configuration during authentication flow
+        authenticationProperties.Items.Add("tenant", tenant);
+
         return Results.Challenge(authenticationProperties, authenticationSchemes: ["Google"]);
     }
 
     private static async Task<IResult> SignInCallback(
+        [FromQuery] string tenant,
         [FromServices] ILogger<Program> logger,
         [FromServices] SignInManager<IdentityUser> signInManager,
         [FromServices] UserManager<IdentityUser> userManager)
     {
+        logger.LogInformation("Current tenant: {tenant}", tenant);
+
         // Get user info from external login provider.
         var info = await signInManager.GetExternalLoginInfoAsync();
         if (info is null)

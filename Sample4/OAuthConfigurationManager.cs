@@ -4,15 +4,16 @@ public sealed class OAuthConfigurationManager(IConfiguration configuration)
 {
     private readonly IConfiguration _configuration = configuration;
 
-    public string GetClientId()
+    public OAuthConfiguration GetConfiguration(string tenant)
     {
-        // Here we could load configuration from database
-        return _configuration["Authentication:Google:ClientId"]!;
-    }
+        // Here we would load configuration from database based on value of the tenant parameter
 
-    public string GetClientSecret()
-    {
-        // Here we could load configuration from database
-        return _configuration["Authentication:Google:ClientSecret"]!;
+        return new OAuthConfiguration(
+            ClientId: _configuration["Authentication:Google:ClientId"]!,
+            ClientSecret: _configuration["Authentication:Google:ClientSecret"]!);
     }
 }
+
+public record OAuthConfiguration(
+    string ClientId,
+    string ClientSecret);
