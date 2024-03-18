@@ -19,6 +19,9 @@ public static class Program
                 {
                     options.ClientId = configuration["Authentication:Google:ClientId"]!;
                     options.ClientSecret = configuration["Authentication:Google:ClientSecret"]!;
+
+                    // WARNING: this must be set to true to be able to hit callback endpoint specified by AuthenticationProperties.RedirectUri
+                    options.SaveTokens = true;
                 });
 
             services.AddAuthorization();
@@ -42,12 +45,18 @@ public static class Program
         app.MapGet("/login", () => Results.Challenge(
             new AuthenticationProperties()
             {
-                RedirectUri = "https://localhost:5056/"
+                RedirectUri = "/callback"
             },
             authenticationSchemes: ["Google"]));
 
-        // ERROR: I am not able to hit this endpoint
-        app.MapGet("/signin-google", (HttpContext httpContext) => { Console.WriteLine("HELLO"); });
+        app.MapGet("/callback", (HttpContext httpContext) =>
+        {
+            Console.WriteLine("Hello from callback");
+
+            // In here, we can do whatever we want with user info
+
+            return Results.Redirect("/");
+        });
 
         app.Run();
     }
