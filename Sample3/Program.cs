@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -5,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExternalLogin;
 
-public static class Program
+public class Program
 {
     public static void Main(string[] args)
     {
@@ -60,12 +61,55 @@ public static class Program
         return Results.Challenge(authenticationProperties, authenticationSchemes: ["Google"]);
     }
 
-    private static IResult SignInCallback(HttpContext httpContext)
+    private static async Task<IResult> SignInCallback(
+        [FromServices] ILogger<Program> logger,
+        [FromServices] SignInManager<IdentityUser> signInManager,
+        [FromServices] UserManager<IdentityUser> userManager)
     {
-        Console.WriteLine("Hello from callback");
+        // Get user info from external login provider.
+        var info = await signInManager.GetExternalLoginInfoAsync();
+        if (info is null)
+        {
+            throw new Exception("Unable to load user info from Google login provider");
+        }
 
-        // In here, we can do whatever we want with user info
+        // Sign in the user with this external login provider if the user already has a login.
+        var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+        if (result.Succeeded)
+        {
+            throw new Exception("Unable to sign in user with Google login provider");
+        }
 
-        return Results.Redirect("/");
+        if (result.IsLockedOut)
+        {
+            throw new Exception("Unable to sign in user because account is locked out");
+        }
+
+        // If the user does not have an account, then ask the user to create an account.
+        var user = new IdentityUser
+        {
+            UserName = string.Concat(info.Principal.Identity?.Name?.Split(" ")!),
+            Email = info.Principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value
+        };
+
+        IdentityResult identityResult;
+
+        identityResult = await userManager.CreateAsync(user);
+        if (identityResult.Succeeded)
+        {
+            identityResult = await userManager.AddLoginAsync(user, info);
+            if (identityResult.Succeeded)
+            {
+                await signInManager.SignInAsync(user, isPersistent: false);
+
+                logger.LogInformation("Created and signed-in new user with id {UserId}.", user.Id);
+
+                // Here you can start email confirmation process by sending an email to specified address.
+
+                return Results.Redirect("/");
+            }
+        }
+
+        return Results.BadRequest(identityResult.Errors);
     }
 }
