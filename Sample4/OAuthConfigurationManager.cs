@@ -6,7 +6,7 @@ public sealed class OAuthConfigurationManager(IConfiguration configuration)
 
     public OAuthConfiguration GetConfiguration(string tenant)
     {
-        // Here we would load configuration from database based on value of the tenant parameter
+        // Here we would load configuration from database or cache based on value of the tenant parameter
 
         return new OAuthConfiguration(
             ClientId: _configuration["Authentication:Google:ClientId"]!,

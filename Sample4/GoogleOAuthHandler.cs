@@ -9,6 +9,9 @@ namespace ExternalLogin;
 // Not every request will use functionality of this handler => for these requests, client id and client secret does not have to be valid values.
 public sealed class GoogleOAuthHandler : GoogleHandler
 {
+    private const string InvalidClientId = "client-id";
+    private const string InvalidClientSecret = "client-secret";
+
     private readonly OAuthConfigurationManager _oAuthConfigurationManager;
 
     [Obsolete("Obsolete")]
@@ -38,8 +41,8 @@ public sealed class GoogleOAuthHandler : GoogleHandler
         var tenant = GetTenantFromRequest();
         if (tenant is null)
         {
-            Options.ClientId = "...";
-            Options.ClientSecret = "...";
+            Options.ClientId = InvalidClientId;
+            Options.ClientSecret = InvalidClientSecret;
         }
         else
         {
